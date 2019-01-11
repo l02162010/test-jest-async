@@ -1,23 +1,43 @@
 import { shallowMount } from "@vue/test-utils";
 import Bank from "@/views/Bank.vue";
-jest.mock("axios", () => ({
-  get: jest.fn(() => Promise.resolve({ data: 3 }))
-}));
+// jest.mock("axios", () => ({
+//   get: jest.fn(() => Promise.resolve({ data: 3 }))
+// }));
+import axios from "axios";
+
+import moxios from "moxios";
+
 describe("Bank.vue", () => {
   const wrapper = shallowMount(Bank);
+
   beforeEach(() => {
     wrapper.vm.balance = 10;
+    moxios.install();
+  });
+
+  afterEach(() => {
+    moxios.uninstall();
   });
 
   it("原本帳戶有 10 元，存入 5 元之後，帳戶餘額變 15 元", done => {
-    // 操作的錢
-    // wrapper.vm.money = 5;
-    // 存錢的按鈕
     wrapper.find("button.deposit").trigger("click");
-    // 期待結餘為15
-    wrapper.vm.$nextTick(() => {
-      expect(wrapper.vm.balance).toBe(15);
-      done();
+    // wrapper.vm.$nextTick(() => {
+    //   expect(wrapper.vm.balance).toBe(15);
+    //   done();
+    // });
+    moxios.wait(function() {
+      let request = moxios.requests.mostRecent();
+      request
+        .respondWith({
+          status: 200,
+          response: {
+            data: 5
+          }
+        })
+        .then(function() {
+          expect(wrapper.vm.balance).toBe(15);
+          done();
+        });
     });
   });
 
@@ -46,9 +66,19 @@ describe("Bank.vue", () => {
     // 領錢的按鈕
     wrapper.find("button.withdraw").trigger("click");
     // 期待結餘為5
-    wrapper.vm.$nextTick(() => {
-      expect(wrapper.vm.balance).toBe(5);
-      done();
+    moxios.wait(function() {
+      let request = moxios.requests.mostRecent();
+      request
+        .respondWith({
+          status: 200,
+          response: {
+            data: 5
+          }
+        })
+        .then(function() {
+          expect(wrapper.vm.balance).toBe(5);
+          done();
+        });
     });
   });
 

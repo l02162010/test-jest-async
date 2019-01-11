@@ -20,14 +20,14 @@ export default {
     async deposit() {
       const response = await axios.get("mock/service");
       if (typeof this.money === "number" && this.money >= 0) {
-        this.balance += response.data;
+        this.balance += response.data.data;
       }
     },
     async withdraw() {
       const response = await axios.get("mock/service");
       var result = /^\d+/.test(this.money);
       if (result && this.money <= this.balance) {
-        this.balance -= response.data;
+        this.balance -= response.data.data;
       }
     }
   }
