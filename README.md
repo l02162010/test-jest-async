@@ -1,5 +1,9 @@
 # vue-test-jest-async
 
+## 想問各位大大為何 跑測試時會timeout
+### 主要檔案在 Views/Bank.vue
+### tests/unit/bank.spec.js
+
 ## Project setup
 ```
 npm install
