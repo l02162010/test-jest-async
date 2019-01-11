@@ -1,44 +1,21 @@
 import { shallowMount } from "@vue/test-utils";
 import Bank from "@/views/Bank.vue";
-// jest.mock("axios", () => ({
-//   get: jest.fn(() => Promise.resolve({ data: 3 }))
-// }));
+//https://github.com/ctimmerm/axios-mock-adapter
+import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
-
-import moxios from "moxios";
+let mock = new MockAdapter(axios);
 
 describe("Bank.vue", () => {
   const wrapper = shallowMount(Bank);
-
   beforeEach(() => {
     wrapper.vm.balance = 10;
-    moxios.install();
   });
 
-  afterEach(() => {
-    moxios.uninstall();
-  });
-
-  it("原本帳戶有 10 元，存入 5 元之後，帳戶餘額變 15 元", done => {
+  it("原本帳戶有 10 元，存入 5 元之後，帳戶餘額變 15 元", async () => {
     wrapper.find("button.deposit").trigger("click");
-    // wrapper.vm.$nextTick(() => {
-    //   expect(wrapper.vm.balance).toBe(15);
-    //   done();
-    // });
-    moxios.wait(function() {
-      let request = moxios.requests.mostRecent();
-      request
-        .respondWith({
-          status: 200,
-          response: {
-            data: 5
-          }
-        })
-        .then(function() {
-          expect(wrapper.vm.balance).toBe(15);
-          done();
-        });
-    });
+    mock.onGet("/mock/service").reply(200, { data: 5 });
+    await axios.get("/mock/service");
+    expect(wrapper.vm.balance).toBe(15);
   });
 
   it("原本帳戶有 10 元，存入 -5 元之後，帳戶餘額還是 10 元（不能存入小於等於零的金額）", () => {
@@ -60,26 +37,14 @@ describe("Bank.vue", () => {
     expect(wrapper.vm.balance).toBe(10);
   });
 
-  it("原本帳戶有 10 元，領出 5 元之後，帳戶餘額變 5 元", done => {
+  it("原本帳戶有 10 元，領出 5 元之後，帳戶餘額變 5 元", async () => {
     // 操作的錢
     wrapper.vm.money = 5;
     // 領錢的按鈕
     wrapper.find("button.withdraw").trigger("click");
-    // 期待結餘為5
-    moxios.wait(function() {
-      let request = moxios.requests.mostRecent();
-      request
-        .respondWith({
-          status: 200,
-          response: {
-            data: 5
-          }
-        })
-        .then(function() {
-          expect(wrapper.vm.balance).toBe(5);
-          done();
-        });
-    });
+    mock.onGet("/mock/service").reply(200, { data: 5 });
+    await axios.get("/mock/service");
+    expect(wrapper.vm.balance).toBe(5);
   });
 
   it("原本帳戶有 10 元，試圖領出 20 元，帳戶餘額還是 10 元，但無法領出（餘額不足）", () => {
