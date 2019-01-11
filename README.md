@@ -1,9 +1,7 @@
 # vue-test-jest-async
 
-## 想問各位大大為何 跑測試時會timeout
-### 主要檔案在
-### Views/Bank.vue
-### tests/unit/bank.spec.js
+## 使用 axios-mock-adapter 去測試async await
+### https://github.com/ctimmerm/axios-mock-adapter
 
 ## Project setup
 ```
